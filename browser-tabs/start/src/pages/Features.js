@@ -1,5 +1,5 @@
-import React from 'react';
+import React from "react";
 
-export default function Features() {
+export function Features() {
   return <div>I am the Features Page</div>;
 }
