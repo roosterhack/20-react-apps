@@ -6,6 +6,13 @@ export default function App() {
   const [x, setX] = useState(0);
   const [y, setY] = useState(0);
 
+  const move = (direction) => {
+    if (direction === 'up') setY((Y) => Y - 20);
+    if (direction === 'left') setX((x) => x - 20);
+    if (direction === 'down') setY((Y) => Y + 20);
+    if (direction === 'right') setX((x) => x + 20);
+  };
+
   useEffect(() => {
     const context = canvasRef.current.getContext('2d');
     context.canvas.height = window.innerHeight;
@@ -21,15 +28,28 @@ export default function App() {
     context.fillRect(x, y, 100, 100);
   }, [x, y]);
 
+  //add eventListener to windows to listen for arrow keys
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'ArrowUp') move('up');
+      if (e.key === 'ArrowLeft') move('left');
+      if (e.key === 'ArrowDown') move('down');
+      if (e.key === 'ArrowRight') move('right');
+    };
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   return (
     <div className='app'>
       <canvas ref={canvasRef} />
 
       <div className='arrows'>
-        <button onClick={() => setY((Y) => Y - 20)}>Up</button>
-        <button onClick={() => setX((x) => x - 20)}>Left</button>
-        <button onClick={() => setY((Y) => Y + 20)}>Down</button>
-        <button onClick={() => setX((x) => x + 20)}>Right</button>
+        <button onClick={() => move('up')}>Up</button>
+        <button onClick={() => move('left')}>Left</button>
+        <button onClick={() => move('down')}>Down</button>
+        <button onClick={() => move('right')}>Right</button>
       </div>
 
       <div className='images'>
