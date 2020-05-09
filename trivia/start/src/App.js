@@ -7,20 +7,24 @@ import './App.css';
 
 export default function App() {
   const [question, setQuestion] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState('any');
 
   useEffect(() => {
     const getQuestion = async () => {
-      const url = 'https://opentdb.com/api.php?amount=1';
+      let url = 'https://opentdb.com/api.php?amount=1';
+      if (selectedCategory !== 'any') url += `&category=${selectedCategory}`;
       try {
         const res = await fetch(url);
         const resQuestion = await res.json();
-        setQuestion(resQuestion.results[0]);
+        if (resQuestion) {
+          setQuestion(resQuestion.results[0]);
+        }
       } catch (err) {
         console.log(err);
       }
     };
     getQuestion();
-  }, []);
+  }, [selectedCategory]);
 
   return (
     <div className='app'>
@@ -29,7 +33,10 @@ export default function App() {
 
       {/* question header ----------------------- */}
       <div className='question-header'>
-        <CategorySelector />
+        <CategorySelector
+          category={selectedCategory}
+          chooseCategory={setSelectedCategory}
+        />
         <Scoreboard />
       </div>
 
