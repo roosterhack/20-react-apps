@@ -1,6 +1,8 @@
-import React, { createContext, useState, useEffect } from "react";
-import createAuth0Client from "@auth0/auth0-spa-js";
+import React, { createContext, useState, useEffect, useContext } from 'react';
+import createAuth0Client from '@auth0/auth0-spa-js';
+
 export const Auth0Context = createContext();
+export const useAuth0 = () => useContext(Auth0Context);
 
 export const Auth0Provider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -12,8 +14,8 @@ export const Auth0Provider = ({ children }) => {
     const initAUth0 = async () => {
       try {
         const auth0 = await createAuth0Client({
-          domain: "roosterhack.eu.auth0.com",
-          client_id: "t1AM5EiirRIlP1kvlul3ErPbOe1BhYPY",
+          domain: 'roosterhack.eu.auth0.com',
+          client_id: 't1AM5EiirRIlP1kvlul3ErPbOe1BhYPY',
           redirect_uri: window.location.origin,
         });
 
@@ -21,8 +23,8 @@ export const Auth0Provider = ({ children }) => {
 
         //handle redirect when user comes back
         if (
-          window.location.search.includes("code=") &&
-          window.location.search.includes("state=")
+          window.location.search.includes('code=') &&
+          window.location.search.includes('state=')
         ) {
           try {
             await auth0.handleRedirectCallback();
@@ -50,6 +52,8 @@ export const Auth0Provider = ({ children }) => {
     initAUth0();
   }, []);
 
+  if (isLoading) return <div>Loading...</div>;
+
   return (
     <Auth0Context.Provider
       value={{
@@ -58,6 +62,7 @@ export const Auth0Provider = ({ children }) => {
         isLoading,
         login: (...p) => auth0Client.loginWithRedirect(...p),
         logout: (...p) => auth0Client.logout(...p),
+        getToken: (...p) => auth0Client.getTokenSilently(...p),
       }}
     >
       {children}
