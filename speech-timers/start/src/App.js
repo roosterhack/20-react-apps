@@ -1,23 +1,32 @@
-import React, { useState, useEffect } from 'react';
-import { useStopwatch } from 'react-timer-hook';
-import './App.css';
+import React, { useState, useEffect, useCallback } from "react";
+import { useStopwatch } from "react-timer-hook";
+import { useSpeechSynthesis } from "react-speech-kit";
+import "./App.css";
 
 export default function App() {
   const [timers, setTimers] = useState([
-    { time: 2, text: 'this is my message' },
-    { time: 5, text: 'What are you doing?' },
-    { time: 8, text: 'Whats up?' },
+    { time: 2, text: "this is my message" },
+    { time: 5, text: "What are you doing?" },
+    { time: 8, text: "Whats up?" },
   ]);
 
   const { seconds, isRunning, start, reset } = useStopwatch();
+
+  const { speak, speaking, supported } = useSpeechSynthesis();
+
+  const doReset = useCallback(() => reset(), []);
+  const doSpeak = useCallback((...p) => speak(...p), []);
 
   useEffect(() => {
     const foundTimer = timers.find((timer) => timer.time === seconds);
 
     if (foundTimer) {
-      //this is where we will speak the text
+      doSpeak({ text: foundTimer.text });
+
+      //check to see if seconds is greater than the last timers time
+      if (seconds > timers[timers.length - 1].time) reset();
     }
-  }, [seconds]);
+  }, [seconds, timers, doSpeak, doReset]);
 
   const updateTimers = (index, time, text) => {
     const newTimers = [...timers];
@@ -28,15 +37,19 @@ export default function App() {
   };
 
   const addTimer = () => {
-    const newTimers = [...timers, { time: 100, text: 'yooooo' }];
+    const newTimers = [...timers, { time: 100, text: "yooooo" }];
     setTimers(newTimers);
   };
 
+  if (!supported) {
+    return <div>Your browser is not supported!</div>;
+  }
+
   return (
-    <div className='app'>
+    <div className="app">
       <h2>Talk the Talk</h2>
 
-      <div className='timers'>
+      <div className="timers">
         {/* timers go here */}
         {timers.map((timer, index) => (
           <TimerSlot
@@ -47,7 +60,7 @@ export default function App() {
           />
         ))}
 
-        <button className='add-button' onClick={addTimer}>
+        <button className="add-button" onClick={addTimer}>
           Add
         </button>
       </div>
@@ -57,17 +70,19 @@ export default function App() {
 
       {/* buttons */}
 
-      <div className='buttons'>
+      <div className="buttons">
         {!isRunning && (
-          <button className='start-button' onClick={start}>
+          <button className="start-button" onClick={start}>
             Start
           </button>
         )}
         {isRunning && (
-          <button className='stop-button' onClick={reset}>
+          <button className="stop-button" onClick={reset}>
             Stop
           </button>
         )}
+
+        {speaking && <p>I am speaking....</p>}
       </div>
     </div>
   );
@@ -82,15 +97,15 @@ const TimerSlot = ({ index, timer, updateTimers }) => {
   };
 
   return (
-    <form className='timer' key={index}>
+    <form className="timer" key={index}>
       <input
-        type='number'
+        type="number"
         value={time}
-        onChange={(e) => setTime(e.target.value)}
+        onChange={(e) => setTime(+e.target.value)}
         onBlur={handleBlur}
       />
       <input
-        type='text'
+        type="text"
         value={text}
         onChange={(e) => setText(e.target.value)}
         onBlur={handleBlur}
