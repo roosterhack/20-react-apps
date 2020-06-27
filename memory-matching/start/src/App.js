@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 import shuffe from 'lodash.shuffle';
 
@@ -17,19 +17,79 @@ const pokemon = [
 const doublePokemon = shuffe([...pokemon, ...pokemon]);
 
 export default function App() {
+  const [opened, setOpened] = useState([]);
+  const [matched, setMatched] = useState([]);
+  const [moves, setMoves] = useState(0);
+
+  // Check if there is a match
+  //If there are 2 in the opened array check if they match
+  useEffect(() => {
+    if (opened.length < 2) return;
+    const firstPokemon = doublePokemon[opened[0]];
+    const secondPokemon = doublePokemon[opened[1]];
+
+    if (firstPokemon.name === secondPokemon.name) {
+      setMatched((matched) => [...matched, firstPokemon.id]);
+    }
+  }, [opened]);
+
+  // Clear card after it had been selected
+  useEffect(() => {
+    if (opened.length === 2) setTimeout(() => setOpened([]), 800);
+  }, [opened]);
+
+  const flipCard = (index) => {
+    setMoves((moves) => moves + 1);
+    setOpened((opened) => [...opened, index]);
+  };
+
+  // Check if there is a winner
+
+  useEffect(() => {
+    if (matched.length === pokemon.length) alert('You won!');
+  }, [matched]);
+
   return (
     <div className='app'>
+      <p>
+        {moves} <strong>Moves</strong>
+      </p>
+      <button
+        onClick={() => {
+          setMatched([]);
+          setMoves(0);
+          setOpened([]);
+        }}
+      >
+        Reset!
+      </button>
       <div className='cards'>
-        {doublePokemon.map((pokemon, index) => (
-          <PokemonCard pokemon={pokemon} index={index} />
-        ))}
+        {doublePokemon.map((pokemon, index) => {
+          let isFlipped = false;
+
+          if (opened.includes(index)) isFlipped = true;
+          if (matched.includes(pokemon.id)) isFlipped = true;
+
+          return (
+            <PokemonCard
+              pokemon={pokemon}
+              key={index}
+              isFlipped={isFlipped}
+              flipCard={flipCard}
+              index={index}
+            />
+          );
+        })}
       </div>
     </div>
   );
 }
 
-const PokemonCard = ({ pokemon, index }) => (
-  <div className='pokemon-card' key={index}>
+const PokemonCard = ({ pokemon, isFlipped, index, flipCard }) => (
+  <button
+    className={`pokemon-card ${isFlipped ? 'flipped' : ''}`}
+    onClick={() => flipCard(index)}
+  >
     <div className='inner'>
       <div className='front'>
         <img
@@ -40,5 +100,5 @@ const PokemonCard = ({ pokemon, index }) => (
       </div>
       <div className='back'>?</div>
     </div>
-  </div>
+  </button>
 );
