@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 
-export default function Tabs() {
+export default function Tabs({ browsers, active }) {
   return (
-    <div className="tabs">
-      <Tab>
-        <button>Click Me</button>
-      </Tab>
+    <div className='tabs'>
+      {browsers.map((browser, index) => (
+        <Tab key={index} isActive={active === index}>
+          <button>{browser}</button>
+        </Tab>
+      ))}
+
       <Tab>
         <button>+</button>
       </Tab>
@@ -35,10 +38,10 @@ function Tab({ index, children, close, isActive }) {
       onMouseOut={hideHighlight}
       onMouseMove={moveHighlight}
     >
-      <div className="highlight" style={highlightStyle} />
+      <div className='highlight' style={highlightStyle} />
       {children}
       {close && (
-        <button className="close-tab" onClick={() => close(index)}>
+        <button className='close-tab' onClick={() => close(index)}>
           x
         </button>
       )}
