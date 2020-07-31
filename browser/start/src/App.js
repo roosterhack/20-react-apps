@@ -1,40 +1,67 @@
-import React, { useState } from 'react';
+import React, { useState, useReducer } from 'react';
 import Tabs from './components/Tabs';
 import AddressBar from './components/AddressBar';
 import './App.css';
 
-export default function App() {
-  //State
-  const [browsers, setBrowsers] = useState([
-    'http://eddiechungdesign.com',
-    'https://learn.chrisoncode.io',
-  ]);
 
-  const [activeBrowser, setActiveBrowser] = useState(0);
+const reducer = (state, action) => {
+  if (action.type === 'ADD') {
+    const browsers = [...state.browsers, '']
+    const activeBrowser = browsers.length - 1
+
+    return {
+      browsers,
+      activeBrowser
+    }
+  }
+  if (action.type === 'CHOOSE') {
+    return {
+      ...state,
+      activeBrowser: action.payload
+    }
+  }
+  if (action.type === 'UPDATE') {
+    const browsers = [...state.browsers];
+    browsers[state.activeBrowser] = action.payload;
+
+    return {
+      ...state,
+      browsers
+    }
+  }
+  if (action.type === 'CLOSE') {
+
+  }
+}
+
+
+export default function App() {
+
+  const [state, dispatch] = useReducer(reducer, {
+    browsers: [
+      'http://eddiechungdesign.com',
+      'https://learn.chrisoncode.io',
+    ],
+    activeBrowser: 0
+  })
+
 
   const chooseBrowser = (id) => {
-    setActiveBrowser(id);
+    dispatch({ type: 'CHOOSE', payload: id })
   };
 
   const addBrowser = () => {
-    const newBrowsers = [...browsers, ''];
-    setBrowsers(newBrowsers);
-    setActiveBrowser(newBrowsers.length - 1);
+    dispatch({ type: 'ADD' })
   };
 
   const updateBrowser = (url) => {
-    const newBrowsers = [...browsers];
-    newBrowsers[activeBrowser] = url;
-    setBrowsers(newBrowsers);
+    dispatch({ type: 'UPDATE', payload: url })
   };
 
+  const { browsers, activeBrowser } = state;
   const url = browsers[activeBrowser];
 
-  // Effects
 
-  //Functions here
-
-  //Formatting or grabbing of data
 
   return (
     <div className='app'>
@@ -52,8 +79,8 @@ export default function App() {
           {url ? (
             <iframe src={url} frameborder='0' title='Stuff'></iframe>
           ) : (
-            <>New Tab Page</>
-          )}
+              <>New Tab Page</>
+            )}
         </div>
       </div>
     </div>
