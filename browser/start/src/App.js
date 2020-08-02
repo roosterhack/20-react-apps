@@ -1,67 +1,76 @@
-import React, { useState, useReducer } from 'react';
-import Tabs from './components/Tabs';
-import AddressBar from './components/AddressBar';
+import React, { useReducer } from 'react';
 import './App.css';
-
+import AddressBar from './components/AddressBar';
+import Tabs from './components/Tabs';
 
 const reducer = (state, action) => {
-  if (action.type === 'ADD') {
-    const browsers = [...state.browsers, '']
-    const activeBrowser = browsers.length - 1
+  const { browsers, activeBrowser } = state;
+  const { type, payload } = action;
+
+  if (type === 'ADD') {
+    const newBrowsers = [...browsers, ''];
+    const activeBrowser = newBrowsers.length - 1;
 
     return {
-      browsers,
-      activeBrowser
-    }
+      browsers: newBrowsers,
+      activeBrowser,
+    };
   }
-  if (action.type === 'CHOOSE') {
-    return {
-      ...state,
-      activeBrowser: action.payload
-    }
-  }
-  if (action.type === 'UPDATE') {
-    const browsers = [...state.browsers];
-    browsers[state.activeBrowser] = action.payload;
-
+  if (type === 'CHOOSE') {
     return {
       ...state,
-      browsers
-    }
+      activeBrowser: payload,
+    };
   }
-  if (action.type === 'CLOSE') {
+  if (type === 'UPDATE') {
+    const newBrowsers = [...browsers];
+    newBrowsers[activeBrowser] = payload;
 
+    return {
+      ...state,
+      browsers: newBrowsers,
+    };
   }
-}
+  if (type === 'CLOSE') {
+    const oldBrowsers = [...browsers];
+    const newBrowsers = oldBrowsers.filter((b, index) => index !== payload);
+    const oldUrl = oldBrowsers[activeBrowser];
 
+    const newActiveBrowser =
+      activeBrowser > newBrowsers.length - 1
+        ? newBrowsers.length - 1
+        : newBrowsers.findIndex((b) => b === oldUrl);
+
+    return {
+      browsers: newBrowsers,
+      activeBrowser: newActiveBrowser,
+    };
+  }
+};
 
 export default function App() {
-
-  const [state, dispatch] = useReducer(reducer, {
-    browsers: [
-      'http://eddiechungdesign.com',
-      'https://learn.chrisoncode.io',
-    ],
-    activeBrowser: 0
-  })
-
+  const [{ browsers, activeBrowser }, dispatch] = useReducer(reducer, {
+    browsers: ['http://eddiechungdesign.com', 'https://learn.chrisoncode.io'],
+    activeBrowser: 0,
+  });
 
   const chooseBrowser = (id) => {
-    dispatch({ type: 'CHOOSE', payload: id })
+    dispatch({ type: 'CHOOSE', payload: id });
   };
 
   const addBrowser = () => {
-    dispatch({ type: 'ADD' })
+    dispatch({ type: 'ADD' });
   };
 
   const updateBrowser = (url) => {
-    dispatch({ type: 'UPDATE', payload: url })
+    dispatch({ type: 'UPDATE', payload: url });
   };
 
-  const { browsers, activeBrowser } = state;
+  const closeBrowser = (id) => {
+    dispatch({ type: 'CLOSE', payload: id });
+  };
+
   const url = browsers[activeBrowser];
-
-
 
   return (
     <div className='app'>
@@ -71,6 +80,7 @@ export default function App() {
           active={activeBrowser}
           choose={chooseBrowser}
           add={addBrowser}
+          close={closeBrowser}
         />
 
         <AddressBar update={updateBrowser} url={url} />
@@ -79,8 +89,8 @@ export default function App() {
           {url ? (
             <iframe src={url} frameborder='0' title='Stuff'></iframe>
           ) : (
-              <>New Tab Page</>
-            )}
+            <>New Tab Page</>
+          )}
         </div>
       </div>
     </div>
