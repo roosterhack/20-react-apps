@@ -3,11 +3,9 @@ import './App.css';
 import { GeoForm } from './components/GeoForm';
 
 // openweathermap.org
-// https://api.openweathermap.org/data/2.5/onecall?lat=33.441792&lon=-94.037689&exclude=hourly,minutely&units=imperial&appid=cef56b6308601e549280f04a34c53e77
-// api key: cef56b6308601e549280f04a34c53e77
+// https://api.openweathermap.org/data/2.5/onecall?lat=33.441792&lon=-94.037689&exclude=hourly,minutely&units=imperial&appid=yourapikey
+// api key: 
 
-// google maps api
-// api key: AIzaSyDo4tB5ETAJxsAyrcQPvpXR-9ZDzmiZvb0
 
 export default function App() {
   const [latLng, setLatLng] = useState(null);

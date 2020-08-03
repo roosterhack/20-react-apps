@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Geocode from 'react-geocode';
 
-Geocode.setApiKey('AIzaSyDp4os33WF6-4d-xFVyL0HsUUHN7dOml_w');
+Geocode.setApiKey(process.env.REACT_APP_GEOCODE_API);
 
 export const GeoForm = ({ setLatLng }) => {
   const [value, setValue] = useState('Hong Kong');
