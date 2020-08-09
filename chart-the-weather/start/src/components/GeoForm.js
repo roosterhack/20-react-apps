@@ -6,16 +6,19 @@ Geocode.setApiKey(process.env.REACT_APP_GEOCODE_API);
 export const GeoForm = ({ setLatLng }) => {
   const [value, setValue] = useState('Hong Kong');
   const getLatLng = useCallback(async (address) => {
-    const res = await Geocode.fromAddress(address);
-    const { lat, lng } = res.results[0].geometry.location;
 
-    console.log(lat, lng);
-    setLatLng({ lat, lng });
-  }, []);
+    if (address) {
+      const res = await Geocode.fromAddress(address);
+      const { lat, lng } = res.results[0].geometry.location;
+      setLatLng({ lat, lng });
+    }
+
+
+  }, [setLatLng]);
 
   useEffect(() => {
     getLatLng(value);
-  }, []);
+  }, [getLatLng, value]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
